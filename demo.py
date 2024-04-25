@@ -7,7 +7,7 @@ from icecream import ic
 import os
 
 from openai import OpenAI
-
+import json
 
 from openai import OpenAI
 client = OpenAI(api_key='sk-s5FeMy0tzTcwa2uyDcBf3c6606C140038a7f904888309aE7',
@@ -23,8 +23,14 @@ def translate_text(text, target_language, model):
             {"role": "user", "content": text}
         ]
     )
+    # message = completion.choices[0].message
+    if completion.choices and completion.choices[0].message:
+        # 直接打印消息内容
+        print(completion.choices[0].message.content)
+    else:
+        print("No translation result.")
 
-    print(completion.choices[0].message)
+    # print(message['content'])
     return
 
 
