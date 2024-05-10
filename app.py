@@ -88,7 +88,7 @@ async def deepseektranslate(deepseekv2: deepseekv2):
     except IndexError:
         raise HTTPException(status_code=500, detail="Translation failed or no content returned")
 
-    return translated_text.split("\n")
+    return [full_text ,translated_text]
 
     # return (response.choices[0].message.content)
 
