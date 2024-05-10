@@ -87,11 +87,19 @@ async def deepseektranslate(deepseekv2: deepseekv2):
         translated_text = response.choices[0].message.content
     except IndexError:
         raise HTTPException(status_code=500, detail="Translation failed or no content returned")
+    ic(translated_text)
+    datas = {
+            "translations": translated_text.split("\n"),
+            "detected_source_lang": full_text + " " + source_lang,
+            "text": translated_text
 
-    return [full_text ,translated_text]
+            }
+    ic(datas)
+
+    return datas
 
     # return (response.choices[0].message.content)
 
 
 if __name__ == "__main__":
-   uvicorn.run("app:app", reload=True, port=5050, host="0.0.0.0")
+   uvicorn.run("app:app", reload=True, port=5055, host="0.0.0.0")
