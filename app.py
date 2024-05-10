@@ -79,21 +79,31 @@ async def deepseektranslate(deepseekv2: deepseekv2):
         model="deepseek-chat",
         messages=[
             {"role": "system", "content": f"You are a professional, authentic translation engine. You only return the translated text, without any explanations."},
-            {"role": "user", "content": f"Please translate into {target_lang} (avoid explaining the original text):{full_text}"}
+            {"role": "user",
+                "content": f"Please translate into {target_lang} (avoid explaining the original text):{full_text}"}
         ]
     )
     try:
         # Accessing the response content safely
         translated_text = response.choices[0].message.content
     except IndexError:
-        raise HTTPException(status_code=500, detail="Translation failed or no content returned")
+        raise HTTPException(
+            status_code=500, detail="Translation failed or no content returned")
     ic(translated_text)
+    # datas = {
+    #         "translations": translated_text.split("\n"),
+    #         "detected_source_lang": full_text + " " + source_lang,
+    #         "text": translated_text
+    #
+    #         }
+    translated_texts = translated_text.split("\n")
     datas = {
-            "translations": translated_text.split("\n"),
-            "detected_source_lang": full_text + " " + source_lang,
-            "text": translated_text
-
-            }
+        "translations": [{
+            "detected_source_lang": source_lang,
+            "text": item
+        } for item in translated_texts],
+        
+    }
     ic(datas)
 
     return datas
@@ -102,4 +112,4 @@ async def deepseektranslate(deepseekv2: deepseekv2):
 
 
 if __name__ == "__main__":
-   uvicorn.run("app:app", reload=True, port=5055, host="0.0.0.0")
+    uvicorn.run("app:app", reload=True, port=5055, host="0.0.0.0")
