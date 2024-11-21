@@ -30,23 +30,27 @@ app.add_middleware(
 class Translate(BaseModel):
     text: str
     model: str = 'gpt-3.5-turbo'
+    source_lang: str
     target_langulage: str
 
 
 @app.post("/translate")
 async def get_translte(translate: Translate):
-    client = OpenAI(api_key='sk-s5FeMy0tzTcwa2uyDcBf3c6606C140038a7f904888309aE7',
-                    base_url='https://cf.luouse.site/v1')
-    text = translate.text
+    client = OpenAI(api_key='sk-Nm7wjb4E0uHMCGuS0130357b6732458d92062c7eB5111c8f',
+                    base_url='https://api.gpt.ge/v1')
+    text = translate.text.strip().replace(",", "").replace("，", "")
     ic(text)
     model = translate.model
     ic(model)
+    source_lang = translate.source_lang
+    ic(source_lang)
+
     target_language = translate.target_langulage
     ic(target_language)
     completion = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": f"You are a professional, authentic translation engine. You translate the input text to {target_language}, returning only the translated text without any explanations."},
+            {"role": "system", "content": f"You are a professional, authentic translation engine. You translate the input text from {source_lang} to {target_language}, returning only the translated text without any explanations."},
             {"role": "user", "content": text}
         ]
     )
