@@ -37,7 +37,7 @@ class Translate(BaseModel):
 @app.post("/translate")
 async def get_translte(translate: Translate):
     client = OpenAI(api_key='sk-Nm7wjb4E0uHMCGuS0130357b6732458d92062c7eB5111c8f',
-                    base_url='https://api.gpt.ge/v1')
+                    base_url='https://api.vveai.com')
     text = translate.text.strip().replace(",", "").replace("，", "")
     ic(text)
     model = translate.model
