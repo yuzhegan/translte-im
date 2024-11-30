@@ -144,4 +144,4 @@ async def deepseektranslate(deepseekv2: deepseekv2):
 
 if __name__ == "__main__":
     # exit()
-    uvicorn.run("app:app", reload=True, port=5055, host="0.0.0.0")
+    # uvicorn.run("app:app", reload=True, port=5055, host="0.0.0.0")
