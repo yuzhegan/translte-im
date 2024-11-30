@@ -33,36 +33,63 @@ class Translate(BaseModel):
     source_lang: str
     target_langulage: str
 
+# 定义一个可以用来切换的API密钥和base_url
+api_keys = [
+    ('sk-Nm7wjb4E0uHMCGuS0130357b6732458d92062c7eB5111c8f', 'https://run.v36.cm/v1'),
+    ('sk-vxai76FlE154fhnx5963819d87164b15B87bFbD61fE70881', 'https://api.oaipro.com/v1')
+]
 
 @app.post("/translate")
 async def get_translte(translate: Translate):
-    client = OpenAI(api_key='sk-Nm7wjb4E0uHMCGuS0130357b6732458d92062c7eB5111c8f',
-                    base_url='https://api.vveai.com')
+    # 初始使用第一个API密钥
+    api_key, base_url = api_keys[0]
+    
+    # 提取请求中的参数
     text = translate.text.strip().replace(",", "").replace("，", "")
-    ic(text)
     model = translate.model
-    ic(model)
     source_lang = translate.source_lang
-    ic(source_lang)
-
     target_language = translate.target_langulage
-    ic(target_language)
-    completion = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": f"You are a professional, authentic translation engine. You translate the input text from {source_lang} to {target_language}, returning only the translated text without any explanations."},
-            {"role": "user", "content": text}
-        ]
-    )
-    # message = completion.choices[0].message
-    if completion.choices and completion.choices[0].message:
-        # 直接打印消息内容
-        ic(completion.choices[0].message.content)
-        return completion.choices[0].message.content
-    else:
-        return "No translation result."
+    
+    # ic(text, model, source_lang, target_language)
+    
+    # 封装翻译请求
+    def request_translation(api_key, base_url):
+        ic(api_key, base_url)
+        client = OpenAI(api_key=api_key, base_url=base_url)
+        try:
+            completion = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": f"You are a professional, authentic translation engine. You translate the input text from {source_lang} to {target_language}, returning only the translated text without any explanations."},
+                    {"role": "user", "content": text}
+                ]
+            )
+            # 判断返回结果是否有效
+            if completion.choices and completion.choices[0].message:
+                return completion.choices[0].message.content
+            else:
+                return "No translation result."
+        except Exception as e:
+            ic(f"Error: {e}")
+            return None
 
-    # print(message['content'])
+    # 首先尝试使用第一个API密钥
+    translated_text = request_translation(api_key, base_url)
+    # ic(translated_text)
+    
+    # 如果第一个API密钥失败，尝试使用第二个API密钥
+    if not translated_text:
+        api_key, base_url = api_keys[1]
+        translated_text = request_translation(api_key, base_url)
+    
+    if translated_text:
+        return translated_text
+    else:
+        return "Translation failed after retrying with a different API key."
+
+
+
+
 
 
 class deepseekv2(BaseModel):
@@ -116,5 +143,5 @@ async def deepseektranslate(deepseekv2: deepseekv2):
 
 
 if __name__ == "__main__":
-    exit()
+    # exit()
     uvicorn.run("app:app", reload=True, port=5055, host="0.0.0.0")
